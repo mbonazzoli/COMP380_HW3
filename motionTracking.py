@@ -109,8 +109,8 @@ while True:
     diff = cv2.absdiff(prevFrame, currFrame)
 
     img, contours, hierarchy = cv2.findContours(diff, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cnt = contours[4]
     cv2.drawContours(currOrig, contours, -1, (0, 255, 0), 3)
+    cv2.imshow("diff", diff )
     cv2.imshow("Motion Tracking", currOrig)
 
     x = cv2.waitKey(20)
