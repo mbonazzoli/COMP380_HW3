@@ -96,7 +96,8 @@ def getNextFrame(vidObj):
     print (type(vidObj), type(frame))
     frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    # ret, gray = cv2.threshold(gray, 100, 200, cv2.THRESH_BINARY)
+    gray = cv2.GaussianBlur(gray, (5, 5), 0)
+    # ret, gray = cv2.threshold(gray, 50, 200, cv2.THRESH_BINARY)
     return frame, gray
 
 cam = cv2.VideoCapture(0)
