@@ -96,7 +96,7 @@ def getNextFrame(vidObj):
     print (type(vidObj), type(frame))
     frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(gray, (5, 5), 0)
+    gray = cv2.GaussianBlur(gray, (25, 25), 0)
     # ret, gray = cv2.threshold(gray, 50, 200, cv2.THRESH_BINARY)
     return frame, gray
 
@@ -109,9 +109,9 @@ while True:
     diff = cv2.absdiff(prevFrame, currFrame)
 
     img, contours, hierarchy = cv2.findContours(diff, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cv2.drawContours(currOrig, contours, -1, (0, 255, 0), 3)
+    cont = cv2.drawContours(diff, contours, -1, (0, 255, 0), 3)
     cv2.imshow("diff", diff )
-    cv2.imshow("Motion Tracking", currOrig)
+    cv2.imshow("Motion Tracking", cont)
 
     x = cv2.waitKey(20)
     c = chr(x & 0xFF)
