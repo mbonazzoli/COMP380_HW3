@@ -96,7 +96,7 @@ def getNextFrame(vidObj):
     print (type(vidObj), type(frame))
     frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
+    blur = cv2.GaussianBlur(gray, (21, 21), 0)
 
     return frame, blur
 
@@ -108,18 +108,18 @@ preOrig, prevFrame = getNextFrame(cam)
 while True:
     currOrig, currFrame = getNextFrame(cam)
     diff = cv2.absdiff(prevFrame, currFrame)
-    ret, gray = cv2.threshold(diff, 50, 255, cv2.THRESH_BINARY)
+    ret, gray = cv2.threshold(diff, 25, 255, cv2.THRESH_BINARY)
     img_dilation = cv2.dilate(gray, kernel, iterations=1)
     img, contours, hierarchy = cv2.findContours(img_dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # cv2.drawContours(currOrig, contours, -1, (0, 255, 0), 3)
 
-
-
+    maxArea = 0
     for c in contours:
         area = cv2.contourArea(c)
-        if(area > 200):
+
+        if(area > 500):
             (x,y, w, h) = cv2.boundingRect(c)
             cv2.rectangle(currOrig, (x,y),(x+w, y+h), (0,255, 0),2)
+            cv2.drawContours(currOrig, contours, -1, (0, 255, 0), 3)
 
     cv2.imshow("diff", img_dilation )
     cv2.imshow("Motion Tracking", currOrig)
