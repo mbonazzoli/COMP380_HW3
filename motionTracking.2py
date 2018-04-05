@@ -94,7 +94,7 @@ def getNextFrame(vidObj):
     (Comment out that line if you want fullsize)."""
     ret, frame = vidObj.read()
     print (type(vidObj), type(frame))
-    # frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+    frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (25, 25), 0)
     # ret, gray = cv2.threshold(gray, 50, 200, cv2.THRESH_BINARY)
@@ -104,34 +104,73 @@ def getNextFrame(vidObj):
 # >>>>>>> 4e52f50ae362250c479a0baa939edb82f958850c
 #
 #     return frame, blur
-
-
+vid1 = cv2.VideoCapture(0)
 kernel = np.ones((5,5), np.uint8)
-cam = cv2.VideoCapture(0)
 cv2.namedWindow('Motion Tracking')
-preOrig, prevFrame = getNextFrame(cam)
+ret, frame = vid1.read()
+twoImage = [frame, frame]
 
 while True:
-    currOrig, currFrame = getNextFrame(cam)
-    diff = cv2.absdiff(prevFrame, currFrame)
-    ret, gray = cv2.threshold(diff, 15, 255, cv2.THRESH_BINARY)
+    ret2, image = vid1.read()
+    twoImage.append(image)
+    twoImage.pop(0)
 
-    img_dilation = cv2.dilate(gray, kernel, iterations=1)
-    img, contours, hierarchy = cv2.findContours(img_dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    pic1 = twoImage[0]
+    pic2 = twoImage[1]
 
-    maxArea = 0
-    for c in contours:
-        area = cv2.contourArea(c)
+    overGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    overGray = cv2.GaussianBlur(overGray, (25, 25), 0)
+    gray1 = cv2.cvtColor(pic1, cv2.COLOR_BGR2GRAY)
+    gray1 = cv2.GaussianBlur(gray1, (25, 25), 0)
+    gray2 = cv2.cvtColor(pic1, cv2.COLOR_BGR2GRAY)
+    gray2 = cv2.GaussianBlur(gray2, (25, 25), 0)
 
-        if(area > 500):
-            (x,y, w, h) = cv2.boundingRect(c)
-            cv2.rectangle(currOrig, (x,y),(x+w, y+h), (0,255, 0),2)
-            cv2.drawContours(currOrig, contours, -1, (0, 255, 0), 3)
+    diffMotion = cv2.absdiff(gray1, gray2)
+    mothresh1 = cv2.threshold(diffMotion, 80, 255, cv2.THRESH_BINARY)[1]
+    mothresh1 = cv2.dilate(mothresh1, None, iterations = 2)
+    mothresh1 = cv2.threshold(diffMotion, 80, 255, cv2.THRESH_BINARY)[1]
+    diffMotion2 = cv2.absdiff(gray1, gray2)
+    mothresh2 = cv2.threshold(diffMotion2, 80, 255, cv2.THRESH_BINARY)[1]
+    mothresh2 = cv2.dilate(mothresh2, None, iterations=2)
+    mothresh2 = cv2.threshold(diffMotion2, 80, 255, cv2.THRESH_BINARY)[1]
 
-    img, contours, hierarchy = cv2.findContours(diff, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cont = cv2.drawContours(diff, contours, -1, (0, 255, 0), 3)
-    # cv2.imshow("diff", diff )
-    # cv2.imshow("Motion Tracking", cont)
+    (_, mycontours, _) = cv2.findContours(mothresh1.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    for c in mycontours:
+        if cv2.contourArea(c) > 600:
+            continue
+        frame = pic2
+
+    (_, mycontours, _) = cv2.findContours(mothresh2.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    cv2.drawContours(image, mycontours, -1, (128, 128, 128), 2)
+    for c in mycontours:
+        if cv2.contourArea(c) < 700:
+            continue
+        x, y, w, h = cv2.boundingRect(c)
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+
+
+    # currOrig, currFrame = getNextFrame(cam)
+    # diff = cv2.absdiff(prevFrame, currFrame)
+    # ret, gray = cv2.threshold(diff, 50, 255, cv2.THRESH_BINARY)
+
+    # img_dilation = cv2.dilate(gray, kernel, iterations=1)
+    # img, contours, hierarchy = cv2.findContours(img_dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    # cv2.drawContours(currOrig, contours, -1, (0, 255, 0), 3)
+
+
+
+
+    # for c in contours:
+    #     area = cv2.contourArea(c)
+    #     if(area > 200):
+    #         (x,y, w, h) = cv2.boundingRect(c)
+    #         cv2.rectangle(currOrig, (x,y),(x+w, y+h), (0,255, 0),2)
+
+# <<<<<<< HEAD
+#     img, contours, hierarchy = cv2.findContours(diff, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+#     cont = cv2.drawContours(diff, contours, -1, (0, 255, 0), 3)
+#     cv2.imshow("diff", diff )
+#     cv2.imshow("Motion Tracking", cont)
 # =======
     cv2.imshow("diff", img_dilation )
     cv2.imshow("Motion Tracking", currOrig)
@@ -140,7 +179,6 @@ while True:
     c = chr(x & 0xFF)
     if c == "q":
         break
-    prevFrame = currFrame
 
 cam.release()
 cv2.destroyAllWindows()
