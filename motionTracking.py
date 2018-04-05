@@ -94,17 +94,16 @@ def getNextFrame(vidObj):
     (Comment out that line if you want fullsize)."""
     ret, frame = vidObj.read()
     print (type(vidObj), type(frame))
-    frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+    # frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-<<<<<<< HEAD
     gray = cv2.GaussianBlur(gray, (25, 25), 0)
     # ret, gray = cv2.threshold(gray, 50, 200, cv2.THRESH_BINARY)
     return frame, gray
-=======
-    blur = cv2.GaussianBlur(gray, (5, 5), 0)
->>>>>>> 4e52f50ae362250c479a0baa939edb82f958850c
-
-    return frame, blur
+# =======
+#     blur = cv2.GaussianBlur(gray, (5, 5), 0)
+# >>>>>>> 4e52f50ae362250c479a0baa939edb82f958850c
+#
+#     return frame, blur
 
 kernel = np.ones((5,5), np.uint8)
 cam = cv2.VideoCapture(0)
@@ -114,7 +113,7 @@ preOrig, prevFrame = getNextFrame(cam)
 while True:
     currOrig, currFrame = getNextFrame(cam)
     diff = cv2.absdiff(prevFrame, currFrame)
-    ret, gray = cv2.threshold(diff, 50, 255, cv2.THRESH_BINARY)
+    ret, gray = cv2.threshold(diff, 15, 255, cv2.THRESH_BINARY)
     img_dilation = cv2.dilate(gray, kernel, iterations=1)
     img, contours, hierarchy = cv2.findContours(img_dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     # cv2.drawContours(currOrig, contours, -1, (0, 255, 0), 3)
@@ -127,15 +126,14 @@ while True:
             (x,y, w, h) = cv2.boundingRect(c)
             cv2.rectangle(currOrig, (x,y),(x+w, y+h), (0,255, 0),2)
 
-<<<<<<< HEAD
     img, contours, hierarchy = cv2.findContours(diff, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cont = cv2.drawContours(diff, contours, -1, (0, 255, 0), 3)
-    cv2.imshow("diff", diff )
-    cv2.imshow("Motion Tracking", cont)
-=======
+    # cv2.imshow("diff", diff )
+    # cv2.imshow("Motion Tracking", cont)
+# =======
     cv2.imshow("diff", img_dilation )
     cv2.imshow("Motion Tracking", currOrig)
->>>>>>> 4e52f50ae362250c479a0baa939edb82f958850c
+# >>>>>>> 4e52f50ae362250c479a0baa939edb82f958850c
 
     x = cv2.waitKey(20)
     c = chr(x & 0xFF)
