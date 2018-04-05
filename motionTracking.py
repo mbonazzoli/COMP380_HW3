@@ -97,7 +97,6 @@ def getNextFrame(vidObj):
     frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (21, 21), 0)
-
     return frame, blur
 
 kernel = np.ones((5,5), np.uint8)
