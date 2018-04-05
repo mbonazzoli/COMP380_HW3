@@ -37,7 +37,6 @@ def locateSign(img):
     thresh = 0.01 * dst.max()
     ret, threshDst = cv2.threshold(dilDist, thresh, 255, cv2.THRESH_BINARY)
 
-
     # display corners points, test
     disp = np.uint8(threshDst)
     cv2.imshow("Harris", disp)
@@ -76,7 +75,7 @@ def findMatch():
         x = cv2.waitKey(10)
         char = chr(x &0xFF)
 
-        if char == 'esc':
+        if char == 'q':
             cv2.destroyAllWindows()
             vidCap.release()
         ret, vid = vidCap.read()
