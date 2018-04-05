@@ -105,6 +105,7 @@ def getNextFrame(vidObj):
 #
 #     return frame, blur
 
+
 kernel = np.ones((5,5), np.uint8)
 cam = cv2.VideoCapture(0)
 cv2.namedWindow('Motion Tracking')
@@ -114,17 +115,18 @@ while True:
     currOrig, currFrame = getNextFrame(cam)
     diff = cv2.absdiff(prevFrame, currFrame)
     ret, gray = cv2.threshold(diff, 15, 255, cv2.THRESH_BINARY)
+
     img_dilation = cv2.dilate(gray, kernel, iterations=1)
     img, contours, hierarchy = cv2.findContours(img_dilation, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    # cv2.drawContours(currOrig, contours, -1, (0, 255, 0), 3)
 
-
-
+    maxArea = 0
     for c in contours:
         area = cv2.contourArea(c)
-        if(area > 200):
+
+        if(area > 500):
             (x,y, w, h) = cv2.boundingRect(c)
             cv2.rectangle(currOrig, (x,y),(x+w, y+h), (0,255, 0),2)
+            cv2.drawContours(currOrig, contours, -1, (0, 255, 0), 3)
 
     img, contours, hierarchy = cv2.findContours(diff, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     cont = cv2.drawContours(diff, contours, -1, (0, 255, 0), 3)
@@ -133,7 +135,6 @@ while True:
 # =======
     cv2.imshow("diff", img_dilation )
     cv2.imshow("Motion Tracking", currOrig)
-# >>>>>>> 4e52f50ae362250c479a0baa939edb82f958850c
 
     x = cv2.waitKey(20)
     c = chr(x & 0xFF)
