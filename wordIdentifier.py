@@ -70,6 +70,11 @@ def compareImages(ref, img):
 def findMatch():
     vidCap = cv2.VideoCapture(0)
     font = cv2.FONT_HERSHEY_SIMPLEX
+    iteration = 0
+    signMatches = {"door":[],"hatch":[],"exit":[]}
+    rollingAvg = 20
+    # signAverages = {"door":[],"hatch":[],"exit":[]}
+
 
     while True:
         x = cv2.waitKey(10)
@@ -79,19 +84,49 @@ def findMatch():
             cv2.destroyAllWindows()
             vidCap.release()
         ret, vid = vidCap.read()
-        cv2.imshow("Sign Match", vid)
-
-        maxMatches = 0
-        signMatch = ''
 
         for name in sign_names:
             numMatches = compareImages(reference_images[name], vid)
-            print(name + " " + str(numMatches))
-            if numMatches > maxMatches:
-                maxMatches = numMatches
-                signMatch = name
+            signMatches[name].append(numMatches)
 
-        print("Final Match " + signMatch + " " + str(maxMatches))
+        if iteration >= rollingAvg:
+            maxMatches = 0
+            signMatch = ''
+
+            for name in sign_names:
+                numMatches = np.mean(signMatches[name][(iteration-rollingAvg):iteration])
+                if numMatches > maxMatches:
+                    maxMatches = numMatches
+                    signMatch = name
+            
+            if(maxMatches > 25):
+                print("Final Match " + signMatch + " " + str(maxMatches))
+                cv2.putText(vid,signMatch,(10,80),cv2.FONT_HERSHEY_SIMPLEX,3,(0,0,255),1)
+            else:
+                print("No sign found")
+                cv2.putText(vid,"NO SIGN",(10,80),cv2.FONT_HERSHEY_SIMPLEX,3,(0,0,255),1)
+            
+        cv2.imshow("Sign Match", vid)
+
+
+            
+
+        
+        iteration = iteration + 1
+
+        # maxMatches = 0
+        # signMatch = ''
+
+        # for name in sign_names:
+        #     numMatches = compareImages(reference_images[name], vid)
+        #     # print(name + " " + str(numMatches))
+        #     if numMatches > maxMatches:
+        #         maxMatches = numMatches
+        #         signMatch = name
+        
+
+
+        # print("Final Match " + signMatch + " " + str(maxMatches))
 
 # compareImages(img1, img2)
 
