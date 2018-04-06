@@ -5,7 +5,6 @@ import time
 
 class honeybeeBehavior(object):
 
-
     def __init__(self, robot = None):
         self.r = robot
         self.FSM = {'seeking': self.updateSeeking,
@@ -16,13 +15,13 @@ class honeybeeBehavior(object):
         self.state = 'seeking'
         self.maxLight = 0
         self.pixy = ev3.Sensor(address = "in2")
-        assert pixy.connected, "Error while connecting Pixy camera to port"
+        assert self.pixy.connected, "Error while connecting Pixy camera to port"
 
     def updateSeeking(self):
         print("seeking")
         print(self.r.leftTouch.is_pressed)
         print(self.r.readDist())
-        if self.r.readColor() == 3:
+        if self.pixy.value(0) == 5:
             return 'found'
         elif (self.r.readDist() <= 4):
             return 'ninety'
@@ -54,7 +53,7 @@ class honeybeeBehavior(object):
         self.r.stop()
         self.r.pointerTo(90)
         self.r.mmot.wait_until_not_moving()
-        if self.r.readColor() == 3:
+        if self.pixy.value(0) == 5:
             return 'found'
         else:
             # self.r.stop()
@@ -81,7 +80,7 @@ class honeybeeBehavior(object):
         self.r.stop()
         return 'end'
 
-    def pixyColor(self):
+    # def pixyColor(self):
 
 
     def run(self):
@@ -112,10 +111,10 @@ def runBehavior(behavObj, runTime = None):
 if __name__ == '__main__':
     #box roby config
     config={SturdyRobot.SturdyRobot.LEFT_MOTOR: 'outC',
-            SturdyRobot.SturdyRobot.RIGHT_MOTOR: 'outB',
+            SturdyRobot.SturdyRobot.RIGHT_MOTOR: 'outA',
             SturdyRobot.SturdyRobot.SERVO_MOTOR: 'outD',
             # SturdyRobot.SturdyRobot.COLOR_SENSOR: 'in2',
-            SturdyRobot.SturdyRobot.GYRO_SENSOR: 'in1',
+            # SturdyRobot.SturdyRobot.GYRO_SENSOR: 'in1',
             SturdyRobot.SturdyRobot.LEFT_TOUCH: 'in4',
             SturdyRobot.SturdyRobot.ULTRA_SENSOR: 'in3'} 
 

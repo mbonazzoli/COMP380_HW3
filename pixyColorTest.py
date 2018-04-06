@@ -9,3 +9,4 @@ pixy.mode = 'ALL'
 
 while True:
 	print(pixy.value(0))
+	print(str(pixy.value(1))+ " " +str(pixy.value(2)))
